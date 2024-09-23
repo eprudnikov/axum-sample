@@ -1,19 +1,35 @@
-mod order;
+mod orders;
+mod configuration;
 
+use std::sync::Arc;
 use axum::Router;
+use axum::routing::get;
+use dotenv::dotenv;
+use sqlx::{Pool, Postgres};
+use crate::configuration::database::setup_db_pool;
+
+struct AppState {
+    db: Pool<Postgres>,
+}
 
 #[tokio::main]
 async fn main() {
-    let app =  setup_router();
+    dotenv().ok();
+    let pool = setup_db_pool();
+    // TODO what does Arc mean?
+    let app_state = Arc::new(AppState { db: pool.await.clone() });
+    let router = setup_router()
+        .with_state(app_state);
 
+    println!("🚀 Server started successfully on port 3000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, router).await.unwrap();
 }
 
 /// The function sequentially passes the router to the feature-specific setup functions so that each
 /// feature-module does its own things.
-fn setup_router() -> Router {
+fn setup_router() -> Router<Arc<AppState>> {
     let app = Router::new();
-    order::setup_router(app)
+    orders::setup_router(app)
 }
 
