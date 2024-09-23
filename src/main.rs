@@ -1,12 +1,11 @@
 mod orders;
 mod configuration;
 
-use std::sync::Arc;
+use crate::configuration::database::setup_db_pool;
 use axum::Router;
-use axum::routing::get;
 use dotenv::dotenv;
 use sqlx::{Pool, Postgres};
-use crate::configuration::database::setup_db_pool;
+use std::sync::Arc;
 
 struct AppState {
     db: Pool<Postgres>,

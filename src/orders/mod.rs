@@ -1,14 +1,14 @@
-use std::sync::Arc;
+mod order;
+mod repository;
+
+use crate::AppState;
 use axum::routing::get;
 use axum::{Json, Router};
 use serde::Serialize;
-use uuid::Uuid;
-use crate::AppState;
-
-#[derive(Serialize, Debug)]
-pub struct Order {
-    pub id: Uuid,
-}
+use std::sync::Arc;
+use axum::extract::State;
+use crate::orders::order::Order;
+use crate::orders::repository::insert;
 
 pub fn setup_router(router: Router<Arc<AppState>>) -> Router<Arc<AppState>> {
     router.route("/orders", get(get_orders)
@@ -16,10 +16,11 @@ pub fn setup_router(router: Router<Arc<AppState>>) -> Router<Arc<AppState>> {
 }
 
 async fn get_orders() -> Json<Vec<Order>> {
-    Json(vec![Order { id: Uuid::new_v4() },
-              Order { id: Uuid::new_v4() }])
+    Json(vec![Order::new(), Order::new()])
 }
 
-async fn post_order() {
-
+async fn post_order(State(state): State<Arc<AppState>>) -> Json<Order> {
+    let new_order = Order::new();
+    insert(&new_order, &state).await;
+    Json(new_order)
 }
