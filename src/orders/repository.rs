@@ -1,7 +1,9 @@
-use crate::AppState;
+use sqlx::Error;
 use crate::orders::order::Order;
+use crate::AppState;
 
-pub async fn insert(order: &Order, app_state: &AppState) -> bool {
+/// Return an error message if any.
+pub async fn create(order: &Order, app_state: &AppState) -> Option<String> {
     match sqlx::query(
         "INSERT INTO orders (id, created_at, updated_at)
         VALUES ($1, $2, $3)")
@@ -9,14 +11,18 @@ pub async fn insert(order: &Order, app_state: &AppState) -> bool {
         .bind(order.created_at)
         .bind(order.updated_at)
         .execute(&app_state.db).await {
-        // TODO map to Result model or similar one
-        Ok(result ) => {
+        Ok(_) => {
             println!("Order {} is created", order.id);
-            true
+            None
         },
         Err(err) => {
             eprintln!("{}", err);
-            false
+            Some(err.to_string())
         }
     }
+}
+
+pub async fn fetch_all(app_state: &AppState) -> Result<Vec<Order>, Error> {
+    sqlx::query_as!(Order, "SELECT * FROM orders")
+        .fetch_all(&app_state.db).await
 }

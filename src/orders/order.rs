@@ -4,7 +4,6 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, FromRow, Deserialize, Serialize)]
-// #[allow(non_snake_case)]
 pub struct Order {
     pub id: Uuid,
     #[serde(rename = "createdAt")]
