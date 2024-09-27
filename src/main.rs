@@ -6,6 +6,7 @@ use axum::Router;
 use dotenv::dotenv;
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
+use tracing::info;
 
 struct AppState {
     db: Pool<Postgres>,
@@ -14,13 +15,15 @@ struct AppState {
 #[tokio::main]
 async fn main() {
     dotenv().ok();
+    tracing_subscriber::fmt::init();
+
     let pool = setup_db_pool();
     // TODO what does Arc mean?
     let app_state = Arc::new(AppState { db: pool.await.clone() });
     let router = setup_router()
         .with_state(app_state);
 
-    println!("🚀 Server started successfully on port 3000");
+    info!("🚀 Server started successfully on port 3000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, router).await.unwrap();
 }

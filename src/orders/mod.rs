@@ -7,6 +7,7 @@ use axum::{Json, Router};
 use serde::Serialize;
 use std::sync::Arc;
 use axum::extract::State;
+use tracing::{error, info};
 use crate::orders::order::Order;
 use crate::orders::repository::{create, fetch_all};
 
@@ -18,11 +19,11 @@ pub fn setup_router(router: Router<Arc<AppState>>) -> Router<Arc<AppState>> {
 async fn get_orders(State(state): State<Arc<AppState>>) -> Json<Vec<Order>> {
     match fetch_all(&state).await {
         Ok(orders) => {
-            println!("Fetch {} orders", orders.len());
+            info!("Fetch {} orders", orders.len());
             Json(orders)
         },
         Err(err) => {
-            eprintln!("Cannot fetch orders: {}", err);
+            error!("Cannot fetch orders: {}", err);
             Json(vec![])
         }
     }

@@ -1,4 +1,5 @@
 use sqlx::Error;
+use tracing::{error, info};
 use crate::orders::order::Order;
 use crate::AppState;
 
@@ -12,11 +13,11 @@ pub async fn create(order: &Order, app_state: &AppState) -> Option<String> {
         .bind(order.updated_at)
         .execute(&app_state.db).await {
         Ok(_) => {
-            println!("Order {} is created", order.id);
+            info!("Order {} is created", order.id);
             None
         },
         Err(err) => {
-            eprintln!("{}", err);
+            error!("{}", err);
             Some(err.to_string())
         }
     }

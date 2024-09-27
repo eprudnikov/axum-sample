@@ -10,7 +10,7 @@ This project is a reference implementation of common features used in microservi
     - [ ] Fetch nested entities
     - [ ] Work with JSONB type
 - [ ] Translate errors to valid JSON responses
-- [ ] Write logs in common format
+- [x] Write logs in common format
 - [ ] Use cache
     - [ ] In-mem
     - [ ] Redis
