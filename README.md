@@ -8,6 +8,7 @@ This project is a reference implementation of common features used in microservi
     - [x] Migration of the DB schema
     - [ ] Fetch data using pagination
     - [ ] Fetch nested entities
+    - [ ] Transactions
     - [ ] Work with JSONB type
 - [ ] Translate errors to valid JSON responses
 - [x] Write logs in common format

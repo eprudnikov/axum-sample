@@ -1,5 +1,5 @@
-mod orders;
 mod configuration;
+mod orders;
 
 use crate::configuration::database::setup_db_pool;
 use axum::Router;
@@ -18,10 +18,10 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     let pool = setup_db_pool();
-    // TODO what does Arc mean?
-    let app_state = Arc::new(AppState { db: pool.await.clone() });
-    let router = setup_router()
-        .with_state(app_state);
+    let app_state = Arc::new(AppState {
+        db: pool.await.clone(),
+    });
+    let router = setup_router().with_state(app_state);
 
     info!("🚀 Server started successfully on port 3000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -34,4 +34,3 @@ fn setup_router() -> Router<Arc<AppState>> {
     let app = Router::new();
     orders::setup_router(app)
 }
-
